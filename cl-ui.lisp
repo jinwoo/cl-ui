@@ -149,8 +149,7 @@
       (funcall on-clicked))))
 
 (defmethod initialize-instance :after ((button button) &key &allow-other-keys)
-  (with-slots (text) button
-    (set-control-pointer button (cl-ui.raw:new-button text)))
+  (set-control-pointer button (cl-ui.raw:new-button (slot-value button 'text)))
   (cl-ui.raw:button-on-clicked (control-pointer button)
                                (cffi:callback %button-on-clicked-cb)
                                (cffi:null-pointer)))
@@ -158,3 +157,55 @@
 (defun (setf button-text) (text button)
   (setf (slot-value button 'text) text)
   (cl-ui.raw:button-set-text (control-pointer button) text))
+
+;;; Box
+
+(defclass box (control)
+  ((direction :type (member :horizontal :vertical) :initarg :direction)))
+
+(defmethod initialize-instance :after ((box box) &key &allow-other-keys)
+  (set-control-pointer box
+                       (ecase (slot-value box 'direction)
+                         (:horizontal (cl-ui.raw:new-horizontal-box))
+                         (:vertical (cl-ui.raw:new-vertical-box)))))
+
+(defun box-append (box child &key stretchy)
+  (cl-ui.raw:box-append (control-pointer box) (control-pointer child) stretchy))
+
+(defun box-delete (box index)
+  (cl-ui.raw:box-delete (control-pointer box) index))
+
+(defun box-padded (box)
+  (cl-ui.raw:box-padded (control-pointer box)))
+
+(defun (setf box-padded) (padded box)
+  (cl-ui.raw:box-set-padded (control-pointer box) padded))
+
+;;; Entry
+
+(defclass entry (control)
+  ((on-changed :type (or function null) :initform nil :accessor entry-on-changed)))
+
+(cffi:defcallback %entry-on-changed-cb :int ((e :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (entry-on-changed (pointer->control e))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((entry entry) &key &allow-other-keys)
+  (set-control-pointer entry (cl-ui.raw:new-entry))
+  (cl-ui.raw:entry-on-changed (control-pointer entry)
+                              (cffi:callback %entry-on-changed-cb)
+                              (cffi:null-pointer)))
+
+(defun entry-text (entry)
+  (cl-ui.raw:entry-text (control-pointer entry)))
+
+(defun (setf entry-text) (text entry)
+  (cl-ui.raw:entry-set-text (control-pointer entry) text))
+
+(defun entry-read-only (entry)
+  (cl-ui.raw:entry-read-only (control-pointer entry)))
+
+(defun (setf entry-read-only) (read-only entry)
+  (cl-ui.raw:entry-set-read-only (control-pointer entry) read-only))

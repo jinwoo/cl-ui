@@ -128,7 +128,12 @@
   (:import-from #:cl-ui.raw
                 #:main
                 #:quit)
-  (:export #:button
+  (:export #:box
+           #:box-append
+           #:box-delete
+           #:box-padded
+           #:button
+           #:button-on-clicked
            #:button-text
            #:control
            #:control-destroy
@@ -136,6 +141,10 @@
            #:control-parent
            #:control-toplevel-p
            #:control-visible-p
+           #:entry
+           #:entry-on-changed
+           #:entry-read-only
+           #:entry-text
            #:main
            #:main-step
            #:on-should-quit
