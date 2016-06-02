@@ -135,6 +135,10 @@
            #:button
            #:button-on-clicked
            #:button-text
+           #:checkbox
+           #:checkbox-checked
+           #:checkbox-on-toggled
+           #:checkbox-text
            #:control
            #:control-destroy
            #:control-enabled-p

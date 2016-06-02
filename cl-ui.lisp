@@ -24,8 +24,9 @@
 
 (cffi:defcallback %on-should-quit (:boolean :int) ((data :pointer))
   (declare (ignore data))
-  (when *on-should-quit*
-    (funcall *on-should-quit*)))
+  (if *on-should-quit*
+      (funcall *on-should-quit*)
+      t))
 
 (defun call-with-ui (fun)
   (trivial-main-thread:with-body-in-main-thread (:blocking t)
@@ -107,7 +108,7 @@
    (on-closing :type (or function null) :initform nil :accessor window-on-closing)
    (child :type (or control null) :initform nil :reader window-child)))
 
-(cffi:defcallback %window-on-closing-cb :int ((w :pointer) (data :pointer))
+(cffi:defcallback %window-on-closing-cb (:boolean :int) ((w :pointer) (data :pointer))
   (declare (ignore data))
   (let ((on-closing (window-on-closing (pointer->control w))))
     (when on-closing
@@ -142,14 +143,14 @@
   ((text :type string :initarg :text :reader button-text)
    (on-clicked :type (or function null) :initform nil :accessor button-on-clicked)))
 
-(cffi:defcallback %button-on-clicked-cb :int ((b :pointer) (data :pointer))
+(cffi:defcallback %button-on-clicked-cb :void ((b :pointer) (data :pointer))
   (declare (ignore data))
-  (let ((on-clicked (button-on-closing (pointer->control b))))
+  (let ((on-clicked (button-on-clicked (pointer->control b))))
     (when on-clicked
       (funcall on-clicked))))
 
 (defmethod initialize-instance :after ((button button) &key &allow-other-keys)
-  (set-control-pointer button (cl-ui.raw:new-button (slot-value button 'text)))
+  (set-control-pointer button (cl-ui.raw:new-button (button-text button)))
   (cl-ui.raw:button-on-clicked (control-pointer button)
                                (cffi:callback %button-on-clicked-cb)
                                (cffi:null-pointer)))
@@ -186,7 +187,7 @@
 (defclass entry (control)
   ((on-changed :type (or function null) :initform nil :accessor entry-on-changed)))
 
-(cffi:defcallback %entry-on-changed-cb :int ((e :pointer) (data :pointer))
+(cffi:defcallback %entry-on-changed-cb :void ((e :pointer) (data :pointer))
   (declare (ignore data))
   (let ((on-changed (entry-on-changed (pointer->control e))))
     (when on-changed
@@ -209,3 +210,33 @@
 
 (defun (setf entry-read-only) (read-only entry)
   (cl-ui.raw:entry-set-read-only (control-pointer entry) read-only))
+
+;;; Checkbox
+
+(defclass checkbox (control)
+  ((text :type string :initarg :text :reader checkbox-text)
+   (on-toggled :type (or function null) :initform nil :accessor checkbox-on-toggled)))
+
+(cffi:defcallback %checkbox-on-toggled-cb :void ((c :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-toggled (checkbox-on-toggled (pointer->control c))))
+    (when on-toggled
+      (funcall on-toggled))))
+
+(defmethod initialize-instance :after ((checkbox checkbox) &key &allow-other-keys)
+  (format t "initialize-instance~%")
+  (set-control-pointer checkbox (cl-ui.raw:new-checkbox (checkbox-text checkbox)))
+  (format t "pointer set~%")
+  (cl-ui.raw:checkbox-on-toggled (control-pointer checkbox)
+                                 (cffi:callback %checkbox-on-toggled-cb)
+                                 (cffi:null-pointer)))
+
+(defun (setf checkbox-text) (text checkbox)
+  (setf (slot-value checkbox 'text) text)
+  (cl-ui.raw:checkbox-set-text (control-pointer checkbox) text))
+
+(defun checkbox-checked (checkbox)
+  (cl-ui.raw:checkbox-checked (control-pointer checkbox)))
+
+(defun (setf checkbox-checked) (checked checkbox)
+  (cl-ui.raw:checkbox-set-checked (control-pointer checkbox) checked))
