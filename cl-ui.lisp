@@ -551,3 +551,67 @@
 
 (defun menu-append-separator (menu)
   (cl-ui.raw:menu-append-separator (object-pointer menu)))
+
+;;; dialog boxes
+
+(defun open-file (parent)
+  (cl-ui.raw:open-file (object-pointer parent)))
+
+(defun save-file (parent)
+  (cl-ui.raw:save-file (object-pointer parent)))
+
+(defun msg-box (parent title description)
+  (cl-ui.raw:msg-box (object-pointer parent) title description))
+
+(defun msg-box-error (parent title description)
+  (cl-ui.raw:msg-box-error (object-pointer parent) title description))
+
+;;; font-button
+
+(defclass font-button (control)
+  ((on-changed :type (or function null) :initform nil :accessor font-button-on-changed)))
+
+(cffi:defcallback %font-button-on-changed-cb :void ((font-button :pointer)
+                                                    (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (font-button-on-changed (pointer->object font-button))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((font-button font-button) &key &allow-other-keys)
+  (setf (object-pointer font-button) (cl-ui.raw:new-font-button))
+  (cl-ui.raw:font-button-on-changed (object-pointer font-button)
+                                    (cffi:callback %font-button-on-changed-cb)
+                                    (cffi:null-pointer)))
+
+(defun font-button-font (font-button)
+  (cl-ui.raw:font-button-font (object-pointer font-button)))
+
+;;; color-button
+
+(defclass color-button (control)
+  ((on-changed :type (or function null) :initform nil :accessor color-button-on-changed)))
+
+(cffi:defcallback %color-button-on-changed-cb :void ((color-button :pointer)
+                                                     (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (color-button-on-changed (pointer->object color-button))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((color-button color-button) &key &allow-other-keys)
+  (setf (object-pointer color-button) (cl-ui.raw:new-color-button))
+  (cl-ui.raw:color-button-on-changed (object-pointer color-button)
+                                     (cffi:callback %color-button-on-changed-cb)
+                                     (cffi:null-pointer)))
+
+(defun color-button-color (color-button)
+  (cffi:with-foreign-objects ((r :double) (g :double) (b :double) (a :double))
+    (cl-ui.raw:color-button-color (object-pointer color-button)
+                                  r g b a)
+    (list r g b a)))
+
+(defun (setf color-button-color) (values color-button)
+  (destructuring-bind (r g b a) values
+    (cl-ui.raw:color-button-set-color (object-pointer color-button)
+                                      r g b a)))

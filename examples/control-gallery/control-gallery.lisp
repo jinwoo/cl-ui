@@ -4,18 +4,18 @@
 
 (defun menu-open-clicked (window)
   (declare (ignore window))
-  (let ((filename (cl-ui.raw:open-file (cl-ui::object-pointer *mainwin*))))
+  (let ((filename (cl-ui:open-file *mainwin*)))
     (if (null filename)
-        (cl-ui.raw:msg-box-error (cl-ui::object-pointer *mainwin*) "No file selected" "Don't be alarmed!")
-        (cl-ui.raw:msg-box (cl-ui::object-pointer *mainwin*) "File selected" filename))))
+        (cl-ui:msg-box-error *mainwin* "No file selected" "Don't be alarmed!")
+        (cl-ui:msg-box *mainwin* "File selected" filename))))
 
 (defun menu-save-clicked (window)
   (declare (ignore window))
-  (let ((filename (cl-ui.raw:save-file (cl-ui::object-pointer *mainwin*))))
+  (let ((filename (cl-ui:save-file *mainwin*)))
     (if (null filename)
-        (cl-ui.raw:msg-box-error (cl-ui::object-pointer *mainwin*) "No file selected" "Don't be alarmed!")
-        (cl-ui.raw:msg-box (cl-ui::object-pointer *mainwin*) "File selected (don't worry, it's still there)"
-                           filename))))
+        (cl-ui:msg-box-error *mainwin* "No file selected" "Don't be alarmed!")
+        (cl-ui:msg-box *mainwin* "File selected (don't worry, it's still there)"
+                       filename))))
 
 (defun %main ()
   (let ((menu (make-instance 'cl-ui:menu :name "File")))
@@ -86,9 +86,9 @@
     (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :time))
     (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :both))
 
-    (cl-ui.raw:box-append (cl-ui::object-pointer inner) (cl-ui.raw:new-font-button) nil)
+    (cl-ui:box-append inner (make-instance 'cl-ui:font-button))
 
-    (cl-ui.raw:box-append (cl-ui::object-pointer inner) (cl-ui.raw:new-color-button) nil)
+    (cl-ui:box-append inner (make-instance 'cl-ui:color-button))
 
     (setf (cl-ui:box-padded inner2) t)
     (cl-ui:box-append hbox inner2 :stretchy t)

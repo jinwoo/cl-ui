@@ -139,6 +139,9 @@
            #:checkbox-checked
            #:checkbox-on-toggled
            #:checkbox-text
+           #:color-button
+           #:color-button-color
+           #:color-button-on-changed
            #:combobox
            #:combobox-append
            #:combobox-on-selected
@@ -158,6 +161,9 @@
            #:entry-on-changed
            #:entry-read-only
            #:entry-text
+           #:font-button
+           #:font-button-font
+           #:font-button-on-changed
            #:group
            #:group-child
            #:group-margined
@@ -178,6 +184,8 @@
            #:menu-item-checked-p
            #:menu-item-enabled-p
            #:menu-item-on-clicked
+           #:msg-box
+           #:msg-box-error
            #:multiline-entry
            #:multiline-entry-append
            #:multiline-entry-on-changed
@@ -185,11 +193,13 @@
            #:multiline-entry-text
            #:multiline-entry-wrapping-p
            #:on-should-quit
+           #:open-file
            #:progress-bar
            #:progress-bar-value
            #:quit
            #:radio-buttons
            #:radio-buttons-append
+           #:save-file
            #:separator
            #:slider
            #:slider-max-value
