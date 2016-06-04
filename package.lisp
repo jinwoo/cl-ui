@@ -158,7 +158,19 @@
            #:main
            #:main-step
            #:on-should-quit
+           #:progress-bar
+           #:progress-bar-value
            #:quit
+           #:slider
+           #:slider-max-value
+           #:slider-min-value
+           #:slider-on-changed
+           #:slider-value
+           #:spinbox
+           #:spinbox-max-value
+           #:spinbox-min-value
+           #:spinbox-on-changed
+           #:spinbox-value
            #:tab
            #:tab-append
            #:tab-delete

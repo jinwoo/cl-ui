@@ -17,23 +17,6 @@
         (cl-ui.raw:msg-box (cl-ui::control-pointer *mainwin*) "File selected (don't worry, it's still there)"
                            filename))))
 
-(defvar *spinbox* nil)
-(defvar *slider* nil)
-(defvar *progressbar* nil)
-
-(defun update (value)
-  (cl-ui.raw:spinbox-set-value *spinbox* value)
-  (cl-ui.raw:slider-set-value *slider* value)
-  (cl-ui.raw:progress-bar-set-value *progressbar* value))
-
-(cffi:defcallback on-spinbox-changed :void ((s :pointer) (data :pointer))
-  (declare (ignore s data))
-  (update (cl-ui.raw:spinbox-value *spinbox*)))
-
-(cffi:defcallback on-slider-changed :void ((s :pointer) (data :pointer))
-  (declare (ignore s data))
-  (update (cl-ui.raw:slider-value *slider*)))
-
 (defun %main ()
   (let ((menu (cl-ui.raw:new-menu "File")))
     (cl-ui.raw:menu-item-on-clicked (cl-ui.raw:menu-append-item menu "Open")
@@ -73,6 +56,9 @@
         (inner2 (make-instance 'cl-ui:box :direction :vertical))
         (group2 (make-instance 'cl-ui:group :title "Numbers"))
         (inner3 (make-instance 'cl-ui:box :direction :vertical))
+        (spinbox (make-instance 'cl-ui:spinbox :min-value 0 :max-value 100))
+        (slider (make-instance 'cl-ui:slider :min-value 0 :max-value 100))
+        (progress-bar (make-instance 'cl-ui:progress-bar))
         (group3 (make-instance 'cl-ui:group :title "Lists"))
         (inner4 (make-instance 'cl-ui:box :direction :vertical))
         (cbox (cl-ui.raw:new-combobox))
@@ -115,18 +101,17 @@
     (setf (cl-ui:box-padded inner3)  t
           (cl-ui:group-child group2) inner3)
 
-    (setf *spinbox* (cl-ui.raw:new-spinbox 0 100))
-    (cl-ui.raw:spinbox-on-changed *spinbox* (cffi:callback on-spinbox-changed)
-                                  (cffi:null-pointer))
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner3) *spinbox* nil)
-
-    (setf *slider* (cl-ui.raw:new-slider 0 100))
-    (cl-ui.raw:slider-on-changed *slider* (cffi:callback on-slider-changed)
-                                 (cffi:null-pointer))
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner3) *slider* nil)
-
-    (setf *progressbar* (cl-ui.raw:new-progress-bar))
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner3) *progressbar* nil)
+    (flet ((update (value)
+             (setf (cl-ui:spinbox-value spinbox)           value
+                   (cl-ui:slider-value slider)             value
+                   (cl-ui:progress-bar-value progress-bar) value)))
+      (setf (cl-ui:spinbox-on-changed spinbox)
+            (lambda () (update (cl-ui:spinbox-value spinbox))))
+      (cl-ui:box-append inner3 spinbox)
+      (setf (cl-ui:slider-on-changed slider)
+            (lambda () (update (cl-ui:slider-value slider))))
+      (cl-ui:box-append inner3 slider)
+      (cl-ui:box-append inner3 progress-bar))
 
     (setf (cl-ui:group-margined group3) t)
     (cl-ui:box-append inner2 group3)

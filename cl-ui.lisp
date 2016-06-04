@@ -67,8 +67,8 @@
 (defun pointer->control (pointer)
   (gethash (cffi:pointer-address pointer) *control-table*))
 
-(defun set-control-pointer (control pointer)
-  (setf (slot-value control 'pointer) pointer
+(defun (setf control-pointer) (pointer control)
+  (setf (slot-value control 'pointer)                            pointer
         (gethash (cffi:pointer-address pointer) *control-table*) control))
 
 (defun control-destroy (control)
@@ -119,9 +119,8 @@
 
 (defmethod initialize-instance :after ((window window) &key &allow-other-keys)
   (with-slots (title initial-width initial-height has-menu-bar) window
-    (set-control-pointer window
-                         (cl-ui.raw:new-window title initial-width initial-height
-                                               has-menu-bar)))
+    (setf (control-pointer window)
+          (cl-ui.raw:new-window title initial-width initial-height has-menu-bar)))
   (cl-ui.raw:window-on-closing (control-pointer window)
                                (cffi:callback %window-on-closing-cb)
                                (cffi:null-pointer)))
@@ -153,7 +152,7 @@
       (funcall on-clicked))))
 
 (defmethod initialize-instance :after ((button button) &key &allow-other-keys)
-  (set-control-pointer button (cl-ui.raw:new-button (button-text button)))
+  (setf (control-pointer button) (cl-ui.raw:new-button (button-text button)))
   (cl-ui.raw:button-on-clicked (control-pointer button)
                                (cffi:callback %button-on-clicked-cb)
                                (cffi:null-pointer)))
@@ -168,10 +167,10 @@
   ((direction :type (member :horizontal :vertical) :initarg :direction)))
 
 (defmethod initialize-instance :after ((box box) &key &allow-other-keys)
-  (set-control-pointer box
-                       (ecase (slot-value box 'direction)
-                         (:horizontal (cl-ui.raw:new-horizontal-box))
-                         (:vertical (cl-ui.raw:new-vertical-box)))))
+  (setf (control-pointer box)
+        (ecase (slot-value box 'direction)
+          (:horizontal (cl-ui.raw:new-horizontal-box))
+          (:vertical (cl-ui.raw:new-vertical-box)))))
 
 (defun box-append (box child &key stretchy)
   (cl-ui.raw:box-append (control-pointer box) (control-pointer child) stretchy))
@@ -197,7 +196,7 @@
       (funcall on-changed))))
 
 (defmethod initialize-instance :after ((entry entry) &key &allow-other-keys)
-  (set-control-pointer entry (cl-ui.raw:new-entry))
+  (setf (control-pointer entry) (cl-ui.raw:new-entry))
   (cl-ui.raw:entry-on-changed (control-pointer entry)
                               (cffi:callback %entry-on-changed-cb)
                               (cffi:null-pointer)))
@@ -227,7 +226,7 @@
       (funcall on-toggled))))
 
 (defmethod initialize-instance :after ((checkbox checkbox) &key &allow-other-keys)
-  (set-control-pointer checkbox (cl-ui.raw:new-checkbox (checkbox-text checkbox)))
+  (setf (control-pointer checkbox) (cl-ui.raw:new-checkbox (checkbox-text checkbox)))
   (cl-ui.raw:checkbox-on-toggled (control-pointer checkbox)
                                  (cffi:callback %checkbox-on-toggled-cb)
                                  (cffi:null-pointer)))
@@ -248,7 +247,7 @@
   ((text :type string :initarg :text :reader label-text)))
 
 (defmethod initialize-instance :after ((label label) &key &allow-other-keys)
-  (set-control-pointer label (cl-ui.raw:new-label (label-text label))))
+  (setf (control-pointer label) (cl-ui.raw:new-label (label-text label))))
 
 (defun (setf label-text) (text label)
   (setf (slot-value label 'text) text)
@@ -260,7 +259,7 @@
   ())
 
 (defmethod initialize-instance :after ((tab tab) &key &allow-other-keys)
-  (set-control-pointer tab (cl-ui.raw:new-tab)))
+  (setf (control-pointer tab) (cl-ui.raw:new-tab)))
 
 (defun tab-append (tab name control)
   (cl-ui.raw:tab-append (control-pointer tab) name (control-pointer control)))
@@ -287,7 +286,7 @@
    (child :type (or control null) :initform nil :reader group-child)))
 
 (defmethod initialize-instance :after ((group group) &key &allow-other-keys)
-  (set-control-pointer group (cl-ui.raw:new-group (group-title group))))
+  (setf (control-pointer group) (cl-ui.raw:new-group (group-title group))))
 
 (defun (setf group-title) (title group)
   (setf (slot-value group 'title) title)
@@ -302,3 +301,67 @@
 
 (defun (setf group-margined) (margined group)
   (cl-ui.raw:group-set-margined (control-pointer group) margined))
+
+;;; Spinbox
+
+(defclass spinbox (control)
+  ((min-value :type integer :initarg :min-value :reader spinbox-min-value)
+   (max-value :type integer :initarg :max-value :reader spinbox-max-value)
+   (on-changed :type (or function null) :initform nil :accessor spinbox-on-changed)))
+
+(cffi:defcallback %spinbox-on-changed-cb :void ((s :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (spinbox-on-changed (pointer->control s))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((spinbox spinbox) &key &allow-other-keys)
+  (setf (control-pointer spinbox) (cl-ui.raw:new-spinbox (spinbox-min-value spinbox)
+                                                         (spinbox-max-value spinbox)))
+  (cl-ui.raw:spinbox-on-changed (control-pointer spinbox)
+                                (cffi:callback %spinbox-on-changed-cb)
+                                (cffi:null-pointer)))
+
+(defun spinbox-value (spinbox)
+  (cl-ui.raw:spinbox-value (control-pointer spinbox)))
+
+(defun (setf spinbox-value) (value spinbox)
+  (cl-ui.raw:spinbox-set-value (control-pointer spinbox) value))
+
+;;; ProgressBar
+
+(defclass progress-bar (control)
+  ((value :type integer :initform 0 :reader progress-bar-value)))
+
+(defmethod initialize-instance :after ((progress-bar progress-bar) &key &allow-other-keys)
+  (setf (control-pointer progress-bar) (cl-ui.raw:new-progress-bar)))
+
+(defun (setf progress-bar-value) (value progress-bar)
+  (setf (slot-value progress-bar 'value) value)
+  (cl-ui.raw:progress-bar-set-value (control-pointer progress-bar) value))
+
+;;; Slider
+
+(defclass slider (control)
+  ((min-value :type integer :initarg :min-value :reader slider-min-value)
+   (max-value :type integer :initarg :max-value :reader slider-max-value)
+   (on-changed :type (or function null) :initform nil :accessor slider-on-changed)))
+
+(cffi:defcallback %slider-on-changed-cb :void ((s :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (slider-on-changed (pointer->control s))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((slider slider) &key &allow-other-keys)
+  (setf (control-pointer slider) (cl-ui.raw:new-slider (slider-min-value slider)
+                                                       (slider-max-value slider)))
+  (cl-ui.raw:slider-on-changed (control-pointer slider)
+                               (cffi:callback %slider-on-changed-cb)
+                               (cffi:null-pointer)))
+
+(defun slider-value (slider)
+  (cl-ui.raw:slider-value (control-pointer slider)))
+
+(defun (setf slider-value) (value slider)
+  (cl-ui.raw:slider-set-value (control-pointer slider) value))
