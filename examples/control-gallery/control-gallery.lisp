@@ -31,7 +31,6 @@
       (cl-ui:menu-append-about-item menu))))
 
 (defun %main ()
-  (make-menus)
   (let ((mainwin (make-instance 'cl-ui:window :title "libui Control Gallery"
                                               :width 640
                                               :height 480
@@ -141,4 +140,5 @@
 
 (defun main ()
   (cl-ui:with-ui ()
+    (make-menus)
     (%main)))
