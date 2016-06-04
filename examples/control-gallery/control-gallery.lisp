@@ -58,7 +58,7 @@
                                                :width 640
                                                :height 480
                                                :has-menu-bar t))
-  (setf (cl-ui:window-margined *mainwin*) t
+  (setf (cl-ui:window-margined *mainwin*)   t
         (cl-ui:window-on-closing *mainwin*) (lambda ()
                                               (cl-ui:control-destroy *mainwin*)
                                               (setf *mainwin* nil)
@@ -67,34 +67,34 @@
 
   (let ((box (make-instance 'cl-ui:box :direction :vertical))
         (hbox (make-instance 'cl-ui:box :direction :horizontal))
-        (group (cl-ui.raw:new-group "Basic Controls"))
+        (group (make-instance 'cl-ui:group :title "Basic Controls"))
         (inner (make-instance 'cl-ui:box :direction :vertical))
         (entry (make-instance 'cl-ui:entry))
         (inner2 (make-instance 'cl-ui:box :direction :vertical))
-        (group2 (cl-ui.raw:new-group "Numbers"))
+        (group2 (make-instance 'cl-ui:group :title "Numbers"))
         (inner3 (make-instance 'cl-ui:box :direction :vertical))
-        (group3 (cl-ui.raw:new-group "Lists"))
+        (group3 (make-instance 'cl-ui:group :title "Lists"))
         (inner4 (make-instance 'cl-ui:box :direction :vertical))
         (cbox (cl-ui.raw:new-combobox))
         (ecbox (cl-ui.raw:new-editable-combobox))
         (rb (cl-ui.raw:new-radio-buttons))
-        (tab (cl-ui.raw:new-tab)))
-    (setf (cl-ui:box-padded box) t
+        (tab (make-instance 'cl-ui:tab)))
+    (setf (cl-ui:box-padded box)         t
           (cl-ui:window-child *mainwin*) box
-          (cl-ui:box-padded hbox) t)
+          (cl-ui:box-padded hbox)        t)
     (cl-ui:box-append box hbox :stretchy t)
 
-    (cl-ui.raw:group-set-margined group t)
-    (cl-ui.raw:box-append (cl-ui::control-pointer hbox) group nil)
+    (setf (cl-ui:group-margined group) t)
+    (cl-ui:box-append hbox group)
 
-    (setf (cl-ui:box-padded inner) t)
-    (cl-ui.raw:group-set-child group (cl-ui::control-pointer inner))
+    (setf (cl-ui:box-padded inner)  t
+          (cl-ui:group-child group) inner)
 
     (cl-ui:box-append inner (make-instance 'cl-ui:button :text "Button"))
     (cl-ui:box-append inner (make-instance 'cl-ui:checkbox :text "Checkbox"))
     (setf (cl-ui:entry-text entry) "Entry")
     (cl-ui:box-append inner entry)
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-label "Label") nil)
+    (cl-ui:box-append inner (make-instance 'cl-ui:label :text "Label"))
 
     (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-horizontal-separator) nil)
 
@@ -109,11 +109,11 @@
     (setf (cl-ui:box-padded inner2) t)
     (cl-ui:box-append hbox inner2 :stretchy t)
 
-    (cl-ui.raw:group-set-margined group2 t)
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner2) group2 nil)
+    (setf (cl-ui:group-margined group2) t)
+    (cl-ui:box-append inner2 group2)
 
-    (setf (cl-ui:box-padded inner3) t)
-    (cl-ui.raw:group-set-child group2 (cl-ui::control-pointer inner3))
+    (setf (cl-ui:box-padded inner3)  t
+          (cl-ui:group-child group2) inner3)
 
     (setf *spinbox* (cl-ui.raw:new-spinbox 0 100))
     (cl-ui.raw:spinbox-on-changed *spinbox* (cffi:callback on-spinbox-changed)
@@ -128,11 +128,11 @@
     (setf *progressbar* (cl-ui.raw:new-progress-bar))
     (cl-ui.raw:box-append (cl-ui::control-pointer inner3) *progressbar* nil)
 
-    (cl-ui.raw:group-set-margined group3 t)
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner2) group3 nil)
+    (setf (cl-ui:group-margined group3) t)
+    (cl-ui:box-append inner2 group3)
 
-    (setf (cl-ui:box-padded inner4) t)
-    (cl-ui.raw:group-set-child group3 (cl-ui::control-pointer inner4))
+    (setf (cl-ui:box-padded inner4) t
+          (cl-ui:group-child group3) inner4)
 
     (cl-ui.raw:combobox-append cbox "Combobox Item 1")
     (cl-ui.raw:combobox-append cbox "Combobox Item 2")
@@ -149,10 +149,10 @@
     (cl-ui.raw:radio-buttons-append rb "Radio Button 3")
     (cl-ui.raw:box-append (cl-ui::control-pointer inner4) rb t)
 
-    (cl-ui.raw:tab-append tab "Page 1" (cl-ui.raw:new-horizontal-box))
-    (cl-ui.raw:tab-append tab "Page 2" (cl-ui.raw:new-horizontal-box))
-    (cl-ui.raw:tab-append tab "Page 3" (cl-ui.raw:new-horizontal-box))
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner2) tab t))
+    (cl-ui:tab-append tab "Page 1" (make-instance 'cl-ui:box :direction :horizontal))
+    (cl-ui:tab-append tab "Page 2" (make-instance 'cl-ui:box :direction :horizontal))
+    (cl-ui:tab-append tab "Page 3" (make-instance 'cl-ui:box :direction :horizontal))
+    (cl-ui:box-append inner2 tab :stretchy t))
 
   (setf (cl-ui:control-visible-p *mainwin*) t)
   (cl-ui:main))

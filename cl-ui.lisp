@@ -227,9 +227,7 @@
       (funcall on-toggled))))
 
 (defmethod initialize-instance :after ((checkbox checkbox) &key &allow-other-keys)
-  (format t "initialize-instance~%")
   (set-control-pointer checkbox (cl-ui.raw:new-checkbox (checkbox-text checkbox)))
-  (format t "pointer set~%")
   (cl-ui.raw:checkbox-on-toggled (control-pointer checkbox)
                                  (cffi:callback %checkbox-on-toggled-cb)
                                  (cffi:null-pointer)))
@@ -243,3 +241,64 @@
 
 (defun (setf checkbox-checked) (checked checkbox)
   (cl-ui.raw:checkbox-set-checked (control-pointer checkbox) checked))
+
+;;; Label
+
+(defclass label (control)
+  ((text :type string :initarg :text :reader label-text)))
+
+(defmethod initialize-instance :after ((label label) &key &allow-other-keys)
+  (set-control-pointer label (cl-ui.raw:new-label (label-text label))))
+
+(defun (setf label-text) (text label)
+  (setf (slot-value label 'text) text)
+  (cl-ui.raw:label-set-text (control-pointer label) text))
+
+;;; Tab
+
+(defclass tab (control)
+  ())
+
+(defmethod initialize-instance :after ((tab tab) &key &allow-other-keys)
+  (set-control-pointer tab (cl-ui.raw:new-tab)))
+
+(defun tab-append (tab name control)
+  (cl-ui.raw:tab-append (control-pointer tab) name (control-pointer control)))
+
+(defun tab-insert (tab name control &key (at 0))
+  (cl-ui.raw:tab-insert-at (control-pointer tab) name at (control-pointer control)))
+
+(defun tab-delete (tab index)
+  (cl-ui.raw:tab-delete (control-pointer tab) index))
+
+(defun tab-num-pages (tab)
+  (cl-ui.raw:tab-num-pages (control-pointer tab)))
+
+(defun tab-margined (tab page)
+  (cl-ui.raw:tab-margined (control-pointer tab) page))
+
+(defun (setf tab-margined) (margined tab page)
+  (cl-ui.raw:tab-set-margined (control-pointer tab) page margined))
+
+;;; Group
+
+(defclass group (control)
+  ((title :type string :initarg :title :reader group-title)
+   (child :type (or control null) :initform nil :reader group-child)))
+
+(defmethod initialize-instance :after ((group group) &key &allow-other-keys)
+  (set-control-pointer group (cl-ui.raw:new-group (group-title group))))
+
+(defun (setf group-title) (title group)
+  (setf (slot-value group 'title) title)
+  (cl-ui.raw:group-set-title (control-pointer group) title))
+
+(defun (setf group-child) (child group)
+  (setf (slot-value group 'child) child)
+  (cl-ui.raw:group-set-child (control-pointer group) (control-pointer child)))
+
+(defun group-margined (group)
+  (cl-ui.raw:group-margined (control-pointer group)))
+
+(defun (setf group-margined) (margined group)
+  (cl-ui.raw:group-set-margined (control-pointer group) margined))

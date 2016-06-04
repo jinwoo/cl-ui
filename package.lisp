@@ -149,10 +149,22 @@
            #:entry-on-changed
            #:entry-read-only
            #:entry-text
+           #:group
+           #:group-child
+           #:group-margined
+           #:group-title
+           #:label
+           #:label-text
            #:main
            #:main-step
            #:on-should-quit
            #:quit
+           #:tab
+           #:tab-append
+           #:tab-delete
+           #:tab-insert
+           #:tab-margined
+           #:tab-num-page
            #:window
            #:window-child
            #:window-margined
