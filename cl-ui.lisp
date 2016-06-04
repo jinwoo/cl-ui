@@ -1,8 +1,11 @@
 (in-package #:cl-ui)
 
-(defparameter *libui-path* "~/playground/libui/out/libui.dylib")
+(cffi:define-foreign-library libui
+  (:darwin "libui/out/libui.dylib")
+  (:unix "libui/out/libui.so")
+  (t (:default "libui")))
 
-(cffi:load-foreign-library *libui-path*)
+(cffi:use-foreign-library libui)
 
 (defun main-step (&key wait)
   (cl-ui.raw:main-step wait))
