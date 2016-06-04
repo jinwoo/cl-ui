@@ -139,12 +139,21 @@
            #:checkbox-checked
            #:checkbox-on-toggled
            #:checkbox-text
+           #:combobox
+           #:combobox-append
+           #:combobox-on-selected
+           #:combobox-selected
            #:control
            #:control-destroy
            #:control-enabled-p
            #:control-parent
            #:control-toplevel-p
            #:control-visible-p
+           #:date-time-picker
+           #:editable-combobox
+           #:editable-combobox-append
+           #:editable-combobox-on-changed
+           #:editable-combobox-text
            #:entry
            #:entry-on-changed
            #:entry-read-only
@@ -157,10 +166,19 @@
            #:label-text
            #:main
            #:main-step
+           #:multiline-entry
+           #:multiline-entry-append
+           #:multiline-entry-on-changed
+           #:multiline-entry-read-only-p
+           #:multiline-entry-text
+           #:multiline-entry-wrapping-p
            #:on-should-quit
            #:progress-bar
            #:progress-bar-value
            #:quit
+           #:radio-buttons
+           #:radio-buttons-append
+           #:separator
            #:slider
            #:slider-max-value
            #:slider-min-value

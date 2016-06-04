@@ -61,9 +61,9 @@
         (progress-bar (make-instance 'cl-ui:progress-bar))
         (group3 (make-instance 'cl-ui:group :title "Lists"))
         (inner4 (make-instance 'cl-ui:box :direction :vertical))
-        (cbox (cl-ui.raw:new-combobox))
-        (ecbox (cl-ui.raw:new-editable-combobox))
-        (rb (cl-ui.raw:new-radio-buttons))
+        (cbox (make-instance 'cl-ui:combobox))
+        (ecbox (make-instance 'cl-ui:editable-combobox))
+        (rb (make-instance 'cl-ui:radio-buttons))
         (tab (make-instance 'cl-ui:tab)))
     (setf (cl-ui:box-padded box)         t
           (cl-ui:window-child *mainwin*) box
@@ -82,11 +82,11 @@
     (cl-ui:box-append inner entry)
     (cl-ui:box-append inner (make-instance 'cl-ui:label :text "Label"))
 
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-horizontal-separator) nil)
+    (cl-ui:box-append inner (make-instance 'cl-ui:separator))
 
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-date-picker) nil)
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-time-picker) nil)
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-date-time-picker) nil)
+    (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :date))
+    (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :time))
+    (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :both))
 
     (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-font-button) nil)
 
@@ -119,20 +119,20 @@
     (setf (cl-ui:box-padded inner4) t
           (cl-ui:group-child group3) inner4)
 
-    (cl-ui.raw:combobox-append cbox "Combobox Item 1")
-    (cl-ui.raw:combobox-append cbox "Combobox Item 2")
-    (cl-ui.raw:combobox-append cbox "Combobox Item 3")
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner4) cbox nil)
+    (cl-ui:combobox-append cbox "Combobox Item 1")
+    (cl-ui:combobox-append cbox "Combobox Item 2")
+    (cl-ui:combobox-append cbox "Combobox Item 3")
+    (cl-ui:box-append inner4 cbox)
 
-    (cl-ui.raw:editable-combobox-append ecbox "Editable Item 1")
-    (cl-ui.raw:editable-combobox-append ecbox "Editable Item 2")
-    (cl-ui.raw:editable-combobox-append ecbox "Editable Item 3")
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner4) ecbox nil)
+    (cl-ui:editable-combobox-append ecbox "Editable Item 1")
+    (cl-ui:editable-combobox-append ecbox "Editable Item 2")
+    (cl-ui:editable-combobox-append ecbox "Editable Item 3")
+    (cl-ui:box-append inner4 ecbox)
 
-    (cl-ui.raw:radio-buttons-append rb "Radio Button 1")
-    (cl-ui.raw:radio-buttons-append rb "Radio Button 2")
-    (cl-ui.raw:radio-buttons-append rb "Radio Button 3")
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner4) rb t)
+    (cl-ui:radio-buttons-append rb "Radio Button 1")
+    (cl-ui:radio-buttons-append rb "Radio Button 2")
+    (cl-ui:radio-buttons-append rb "Radio Button 3")
+    (cl-ui:box-append inner4 rb :stretchy t)
 
     (cl-ui:tab-append tab "Page 1" (make-instance 'cl-ui:box :direction :horizontal))
     (cl-ui:tab-append tab "Page 2" (make-instance 'cl-ui:box :direction :horizontal))

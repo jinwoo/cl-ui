@@ -365,3 +365,122 @@
 
 (defun (setf slider-value) (value slider)
   (cl-ui.raw:slider-set-value (control-pointer slider) value))
+
+;;; Separator
+
+(defclass separator (control)
+  ())
+
+(defmethod initialize-instance :after ((separator separator) &key &allow-other-keys)
+  (setf (control-pointer separator) (cl-ui.raw:new-horizontal-separator)))
+
+;;; Combobox
+
+(defclass combobox (control)
+  ((on-selected :type (or function null) :initform nil :accessor combobox-on-selected)))
+
+(cffi:defcallback %combobox-on-selected-cb :void ((c :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-selected (combobox-on-selected (pointer->control c))))
+    (when on-selected
+      (funcall on-selected))))
+
+(defmethod initialize-instance :after ((combobox combobox) &key &allow-other-keys)
+  (setf (control-pointer combobox) (cl-ui.raw:new-combobox))
+  (cl-ui.raw:combobox-on-selected (control-pointer combobox)
+                                  (cffi:callback %combobox-on-selected-cb)
+                                  (cffi:null-pointer)))
+
+(defun combobox-append (combobox text)
+  (cl-ui.raw:combobox-append (control-pointer combobox) text))
+
+(defun combobox-selected (combobox)
+  (cl-ui.raw:combobox-selected (control-pointer combobox)))
+
+(defun (setf combobox-selected) (selected combobox)
+  (cl-ui.raw:combobox-set-selected (control-pointer combobox) selected))
+
+;;; EditableCombobox
+
+(defclass editable-combobox (control)
+  ((on-changed :type (or function null) :initform nil :accessor editable-combobox-on-changed)))
+
+(cffi:defcallback %editable-combobox-on-changed-cb :void ((c :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (editable-combobox-on-changed (pointer->control c))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((editable-combobox editable-combobox) &key &allow-other-keys)
+  (setf (control-pointer editable-combobox) (cl-ui.raw:new-editable-combobox))
+  (cl-ui.raw:editable-combobox-on-changed (control-pointer editable-combobox)
+                                          (cffi:callback %editable-combobox-on-changed-cb)
+                                          (cffi:null-pointer)))
+
+(defun editable-combobox-append (editable-combobox text)
+  (cl-ui.raw:editable-combobox-append (control-pointer editable-combobox) text))
+
+(defun editable-combobox-text (editable-combobox)
+  (cl-ui.raw:editable-combobox-text (control-pointer editable-combobox)))
+
+(defun (setf editable-combobox-text) (text editable-combobox)
+  (cl-ui.raw:editable-combobox-set-text (control-pointer editable-combobox) text))
+
+;;; RadioButtons
+
+(defclass radio-buttons (control)
+  ())
+
+(defmethod initialize-instance :after ((radio-buttons radio-buttons) &key &allow-other-keys)
+  (setf (control-pointer radio-buttons) (cl-ui.raw:new-radio-buttons)))
+
+(defun radio-buttons-append (radio-buttons text)
+  (cl-ui.raw:radio-buttons-append (control-pointer radio-buttons) text))
+
+;;; DateTimePicker
+
+(defclass date-time-picker (control)
+  ((type :type (or :date :time :both) :initarg :type :initform :both)))
+
+(defmethod initialize-instance :after ((date-time-picker date-time-picker) &key &allow-other-keys)
+  (setf (control-pointer date-time-picker)
+        (ecase (slot-value date-time-picker 'type)
+          (:both (cl-ui.raw:new-date-time-picker))
+          (:date (cl-ui.raw:new-date-picker))
+          (:time (cl-ui.raw:new-time-picker)))))
+
+;;; MultilineEntry
+
+(defclass multiline-entry (control)
+  ((wrapping :type boolean :initarg :wrapping :initform t :reader multiline-entry-wrapping-p)
+   (on-changed :type (or function null) :initform nil :accessor multiline-entry-on-changed)))
+
+(cffi:defcallback %multiline-entry-on-changed-cb :void ((e :pointer) (data :pointer))
+  (declare (ignore data))
+  (let ((on-changed (multiline-entry-on-changed (pointer->control e))))
+    (when on-changed
+      (funcall on-changed))))
+
+(defmethod initialize-instance :after ((multiline-entry multiline-entry) &key &allow-other-keys)
+  (setf (control-pointer multiline-entry)
+        (if (multiline-entry-wrapping-p multiline-entry)
+            (cl-ui.raw:new-multiline-entry)
+            (cl-ui.raw:new-non-wrapping-multiline-entry)))
+  (cl-ui.raw:multiline-entry-on-changed (control-pointer multiline-entry)
+                                        (cffi:callback %multiline-entry-on-changed-cb)
+                                        (cffi:null-pointer)))
+
+(defun multiline-entry-text (multiline-entry)
+  (cl-ui.raw:multiline-entry-text (control-pointer multiline-entry)))
+
+(defun (setf multiline-entry-text) (text multiline-entry)
+  (cl-ui.raw:multiline-entry-set-text (control-pointer multiline-entry) text))
+
+(defun multiline-entry-append (multiline-entry text)
+  (cl-ui.raw:multiline-entry-append (control-pointer multiline-entry) text))
+
+(defun multiline-entry-read-only-p (multiline-entry)
+  (cl-ui.raw:multiline-entry-read-only (control-pointer multiline-entry)))
+
+(defun (setf multiline-entry-read-only-p) (read-only multiline-entry)
+  (cl-ui.raw:multiline-entry-set-read-only (control-pointer multiline-entry) read-only))
