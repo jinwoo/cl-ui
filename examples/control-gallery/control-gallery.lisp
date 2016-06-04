@@ -2,40 +2,38 @@
 
 (defvar *mainwin* nil)
 
-(cffi:defcallback open-clicked :void ((item :pointer) (w :pointer) (data :pointer))
-  (declare (ignore item w data))
-  (let ((filename (cl-ui.raw:open-file (cl-ui::control-pointer *mainwin*))))
+(defun menu-open-clicked (window)
+  (declare (ignore window))
+  (let ((filename (cl-ui.raw:open-file (cl-ui::object-pointer *mainwin*))))
     (if (null filename)
-        (cl-ui.raw:msg-box-error (cl-ui::control-pointer *mainwin*) "No file selected" "Don't be alarmed!")
-        (cl-ui.raw:msg-box (cl-ui::control-pointer *mainwin*) "File selected" filename))))
+        (cl-ui.raw:msg-box-error (cl-ui::object-pointer *mainwin*) "No file selected" "Don't be alarmed!")
+        (cl-ui.raw:msg-box (cl-ui::object-pointer *mainwin*) "File selected" filename))))
 
-(cffi:defcallback save-clicked :void ((item :pointer) (w :pointer) (data :pointer))
-  (declare (ignore item w data))
-  (let ((filename (cl-ui.raw:save-file (cl-ui::control-pointer *mainwin*))))
+(defun menu-save-clicked (window)
+  (declare (ignore window))
+  (let ((filename (cl-ui.raw:save-file (cl-ui::object-pointer *mainwin*))))
     (if (null filename)
-        (cl-ui.raw:msg-box-error (cl-ui::control-pointer *mainwin*) "No file selected" "Don't be alarmed!")
-        (cl-ui.raw:msg-box (cl-ui::control-pointer *mainwin*) "File selected (don't worry, it's still there)"
+        (cl-ui.raw:msg-box-error (cl-ui::object-pointer *mainwin*) "No file selected" "Don't be alarmed!")
+        (cl-ui.raw:msg-box (cl-ui::object-pointer *mainwin*) "File selected (don't worry, it's still there)"
                            filename))))
 
 (defun %main ()
-  (let ((menu (cl-ui.raw:new-menu "File")))
-    (cl-ui.raw:menu-item-on-clicked (cl-ui.raw:menu-append-item menu "Open")
-                                    (cffi:callback open-clicked) (cffi:null-pointer))
-    (cl-ui.raw:menu-item-on-clicked (cl-ui.raw:menu-append-item menu "Save")
-                                    (cffi:callback save-clicked) (cffi:null-pointer))
-    (cl-ui.raw:menu-append-quit-item menu)
+  (let ((menu (make-instance 'cl-ui:menu :name "File")))
+    (setf (cl-ui:menu-item-on-clicked (cl-ui:menu-append-item menu "Open")) #'menu-open-clicked
+          (cl-ui:menu-item-on-clicked (cl-ui:menu-append-item menu "Save")) #'menu-save-clicked)
+    (cl-ui:menu-append-quit-item menu)
     (setf (cl-ui:on-should-quit) (lambda ()
                                    (cl-ui:control-destroy *mainwin*)
                                    (setf *mainwin* nil)
                                    t)))
-  (let ((menu (cl-ui.raw:new-menu "Edit")))
-    (cl-ui.raw:menu-append-check-item menu "Checkable Item")
-    (cl-ui.raw:menu-append-separator menu)
-    (cl-ui.raw:menu-item-disable (cl-ui.raw:menu-append-item menu "Disabled Item"))
-    (cl-ui.raw:menu-append-preferences-item menu))
-  (let ((menu (cl-ui.raw:new-menu "Help")))
-    (cl-ui.raw:menu-append-item menu "Help")
-    (cl-ui.raw:menu-append-about-item menu))
+  (let ((menu (make-instance 'cl-ui:menu :name "Edit")))
+    (cl-ui:menu-append-check-item menu "Checkable Item")
+    (cl-ui:menu-append-separator menu)
+    (setf (cl-ui:menu-item-enabled-p (cl-ui:menu-append-item menu "Disabled Item")) nil)
+    (cl-ui:menu-append-preferences-item menu))
+  (let ((menu (make-instance 'cl-ui:menu :name "Help")))
+    (cl-ui:menu-append-item menu "Help")
+    (cl-ui:menu-append-about-item menu))
 
   (setf *mainwin* (make-instance 'cl-ui:window :title "libui Control Gallery"
                                                :width 640
@@ -88,9 +86,9 @@
     (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :time))
     (cl-ui:box-append inner (make-instance 'cl-ui:date-time-picker :type :both))
 
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-font-button) nil)
+    (cl-ui.raw:box-append (cl-ui::object-pointer inner) (cl-ui.raw:new-font-button) nil)
 
-    (cl-ui.raw:box-append (cl-ui::control-pointer inner) (cl-ui.raw:new-color-button) nil)
+    (cl-ui.raw:box-append (cl-ui::object-pointer inner) (cl-ui.raw:new-color-button) nil)
 
     (setf (cl-ui:box-padded inner2) t)
     (cl-ui:box-append hbox inner2 :stretchy t)

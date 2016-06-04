@@ -166,6 +166,18 @@
            #:label-text
            #:main
            #:main-step
+           #:menu
+           #:menu-append-about-item
+           #:menu-append-check-item
+           #:menu-append-item
+           #:menu-append-preferences-item
+           #:menu-append-quit-item
+           #:menu-append-separator
+           #:menu-name
+           #:menu-item
+           #:menu-item-checked-p
+           #:menu-item-enabled-p
+           #:menu-item-on-clicked
            #:multiline-entry
            #:multiline-entry-append
            #:multiline-entry-on-changed
