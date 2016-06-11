@@ -2,13 +2,11 @@
 
 (defun make-menus ()
   (flet ((menu-open-clicked (window)
-           (declare (ignore window))
            (let ((filename (cl-ui:open-file window)))
              (if filename
                  (cl-ui:msg-box window "File selected" filename)
                  (cl-ui:msg-box-error window "No file selected" "Don't be alarmed!"))))
          (menu-save-clicked (window)
-           (declare (ignore window))
            (let ((filename (cl-ui:save-file window)))
              (if filename
                  (cl-ui:msg-box window "File selected (don't worry, it's still there)"
