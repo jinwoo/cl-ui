@@ -40,6 +40,9 @@
            #:entry-text
            #:font-button-font
            #:font-button-on-changed
+           #:form-append
+           #:form-padded
+           #:form-set-padded
            #:free-init-error
            #:free-text
            #:group-margined
@@ -81,6 +84,7 @@
            #:new-editable-combobox
            #:new-entry
            #:new-font-button
+           #:new-form
            #:new-group
            #:new-horizontal-box
            #:new-horizontal-separator
@@ -88,8 +92,10 @@
            #:new-menu
            #:new-multiline-entry
            #:new-non-wrapping-multiline-entry
+           #:new-password-entry
            #:new-progress-bar
            #:new-radio-buttons
+           #:new-search-entry
            #:new-slider
            #:new-spinbox
            #:new-tab
@@ -102,6 +108,9 @@
            #:queue-main
            #:quit
            #:radio-buttons-append
+           #:radio-buttons-on-selected
+           #:radio-buttons-selected
+           #:radio-buttons-set-selected
            #:save-file
            #:slider-on-changed
            #:slider-set-value

@@ -172,6 +172,10 @@
 
 (cffi:defcfun (new-entry "uiNewEntry") :pointer)
 
+(cffi:defcfun (new-password-entry "uiNewPasswordEntry") :pointer)
+
+(cffi:defcfun (new-search-entry "uiNewSearchEntry") :pointer)
+
 ;;; Checkbox
 
 (cffi:defcfun (checkbox-text "uiCheckboxText") ui-string
@@ -356,6 +360,18 @@
   (r :pointer)
   (text :string))
 
+(cffi:defcfun (radio-buttons-selected "uiRadioButtonsSelected") intmax
+  (r :pointer))
+
+(cffi:defcfun (radio-buttons-set-selected "uiRadioButtonsSetSelected") :void
+  (r :pointer)
+  (n intmax))
+
+(cffi:defcfun (radio-buttons-on-selected "uiRadioButtonsOnSelected") :void
+  (r :pointer)
+  (f :pointer)
+  (data :pointer))
+
 (cffi:defcfun (new-radio-buttons "uiNewRadioButtons") :pointer)
 
 ;;; DateTimePicker
@@ -492,3 +508,20 @@
   (data :pointer))
 
 (cffi:defcfun (new-color-button "uiNewColorButton") :pointer)
+
+;;; Form
+
+(cffi:defcfun (form-append "uiFormAppend") :void
+  (f :pointer)
+  (label :string)
+  (c :pointer)
+  (stretchy (:boolean :int)))
+
+(cffi:defcfun (form-padded "uiFormPadded") (:boolean :int)
+  (f :pointer))
+
+(cffi:defcfun (form-set-padded "uiFormSetPadded") :void
+  (f :pointer)
+  (padded (:boolean :int)))
+
+(cffi:defcfun (new-form "uiNewForm") :pointer)
