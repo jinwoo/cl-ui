@@ -1,8 +1,8 @@
 (in-package #:cl-ui)
 
 (cffi:define-foreign-library libui
-  (:darwin "libui/out/libui.dylib")
-  (:unix "libui/out/libui.so")
+  (:darwin "libui/build/out/libui.dylib")
+  (:unix "libui/build/out/libui.so")
   (t (:default "libui")))
 
 (cffi:use-foreign-library libui)
